@@ -34,15 +34,12 @@ CREATE TABLE role (
     -- manager_id: INT to hold reference to another employee that is the manager of the current employee 
         -- (null if the employee has no manager)
 CREATE TABLE employee (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    id INT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(30) NOT NULL,
     last_name VARCHAR(30) NOT NULL,
     role_id INT,
     FOREIGN KEY (role_id)
     REFERENCES role(id)
     ON DELETE SET NULL,
-    manager_id INT
+    manager_id INT NULL
 );
-
-ALTER TABLE employee 
-    ADD FOREIGN KEY (manager_id) REFERENCES employee(id);
