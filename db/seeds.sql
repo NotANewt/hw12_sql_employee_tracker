@@ -22,7 +22,7 @@ VALUES ("Director", 100000, 1),
        ("Union Executive", 95000, 5),
        ("Soldier", 50000, 5);
 
--- seed managers into employee table
+-- seed employees that are managers and have no managers
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES ("Scarlet", "Sukaretto", 1, null),
        ("Hojo", "Hakase", 3, null),
