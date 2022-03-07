@@ -12,7 +12,7 @@ const mainMenuPrompt = [
 ];
 
 /*
- figletMain()
+ bannerMain()
   prints out ASCII text banner in terminal
     * prints out "Employee Tracker" in terminal
     * calls runMainMenu function
@@ -48,25 +48,98 @@ function bannerMain() {
 */
 function runMainMenu() {
   inquirer.prompt(mainMenuPrompt).then(function (answers) {
-    console.log(answers);
-    // const mainMenuAnswer = new manager(answers);
+    let mainMenuPick = answers.mainOptions;
 
-    // newManagerObj.name = employeeManager.getName();
-    // newManagerObj.id = employeeManager.getId();
-    // newManagerObj.email = employeeManager.getEmail();
-    // newManagerObj.officeNumber = employeeManager.getOfficeNumber();
-    // newManagerObj.role = employeeManager.getRole();
-
-    // let whatNext = answers.whatNext;
-
-    // if (whatNext === "Finish Building My Team") {
-    //   finishBuildingTeam();
-    // } else if (whatNext === "Add An Enginner to My Team") {
-    //   runInquirerForEngineer();
-    // } else {
-    //   runInquirerForIntern();
-    // }
+    if (mainMenuPick === "View All Employees") {
+      viewAllEmployees();
+    } else if (mainMenuPick === "Add Employee") {
+      addEmployee();
+    } else if (mainMenuPick === "Update Employee Role") {
+      updateEmployeeRole();
+    } else if (mainMenuPick === "View All Roles") {
+      viewAllRoles();
+    } else if (mainMenuPick === "Add Role") {
+      addRole();
+    } else if (mainMenuPick === "View All Departments") {
+      viewAllDepartments();
+    } else if (mainMenuPick === "Add Department") {
+      addDepartment();
+    } else {
+      quitTracker();
+    }
   });
+}
+
+/*
+ viewAllEmployees()
+  returns table with all employees
+    * 
+*/
+function viewAllEmployees() {
+  console.log("They chose to View All Employees");
+}
+
+/*
+ addEmployee()
+  add new employee to employee table
+    * 
+*/
+function addEmployee() {
+  console.log("They chose to Add Employee");
+}
+
+/*
+ updateEmployeeRole()
+  add new employee to employee table
+    * 
+*/
+function updateEmployeeRole() {
+  console.log("They chose to Update Employee Role");
+}
+
+/*
+ viewAllRoles()
+  returns roles table
+    * 
+*/
+function viewAllRoles() {
+  console.log("They chose to View All Roles");
+}
+
+/*
+ addRole()
+  add new role to role table
+    * 
+*/
+function addRole() {
+  console.log("They chose to Add Role");
+}
+
+/*
+ viewAllDepartments()
+  returns department table
+    * 
+*/
+function viewAllDepartments() {
+  console.log("They chose to View All Departments");
+}
+
+/*
+ addDepartment()
+  add new department to department table
+    * 
+*/
+function addDepartment() {
+  console.log("They chose to Add Department");
+}
+
+/*
+ quitTracker()
+  quit the app
+    * 
+*/
+function quitTracker() {
+  console.log("They chose to Quit");
 }
 
 /*
