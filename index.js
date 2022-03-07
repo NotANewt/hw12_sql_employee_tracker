@@ -3,6 +3,7 @@ const express = require("express");
 const cTable = require("console.table");
 const app = express();
 const departmentClass = require("./lib/department.js");
+let sqldb = require("./server").sqldb;
 
 // Array with Main Menu prompt
 const mainMenuPrompt = [
@@ -124,7 +125,8 @@ function addRole() {
     * 
 */
 function viewAllDepartments() {
-  console.log("They chose to View All Departments");
+  let allDepartmentsData = departmentClass.sqlRequestAllDepartments(sqldb);
+  console.log(allDepartmentsData);
 }
 
 /*
