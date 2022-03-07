@@ -25,24 +25,39 @@ LEFT JOIN department ON role.department_id = department.id
 LEFT JOIN employee AS manager ON employee.manager_id = manager.id
 ORDER BY employee.id
 
-
-
 -- add a department
     -- WHEN I choose to add a department
     -- THEN I am prompted to enter the name of the department and that department is added to the database
-
+INSERT INTO department (name)
+VALUES
+-- get this from user input
+("new department name");
 
 -- add a role
     -- WHEN I choose to add a role
     -- THEN I am prompted to enter the name, salary, and department for the role and that role is added to the database
+INSERT INTO role (title, salary, department_id)
+VALUES
+-- get this from user input
+-- department_id needs to come from department.name
+("role title", salary, department_id);
 
 -- add an employee
     -- WHEN I choose to add an employee
     -- THEN I am prompted to enter the employee’s first name, last name, role, and manager, and that employee is added to the database
+INSERT INTO employee (first_name, last_name, role_id, manager_id)
+VALUES
+-- get this from user input
+-- role_id needs to come from role.title
+-- department_id needs to come from department.name
+("role title", salary, department_id);
 
 -- update an employee role
     -- WHEN I choose to update an employee role
     -- THEN I am prompted to select an employee to update and their new role and this information is updated in the database 
+UPDATE employee
+SET role_id = 1
+WHERE employee.id = employeeId
 
 
 -- Bonus
