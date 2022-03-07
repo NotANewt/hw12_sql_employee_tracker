@@ -14,6 +14,7 @@ FROM role;
     -- WHEN I choose to view all employees
     -- THEN I am presented with a formatted table showing employee data, including employee ids, first names, last names, 
     -- job titles, departments, salaries, and managers that the employees report to
+
 SELECT 
     employee.id, employee.first_name, employee.last_name, 
     role.title AS job_title, role.salary, 

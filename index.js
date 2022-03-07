@@ -1,5 +1,8 @@
 const inquirer = require("inquirer");
+const express = require("express");
 const cTable = require("console.table");
+const app = express();
+const departmentClass = require("./lib/department.js");
 
 // Array with Main Menu prompt
 const mainMenuPrompt = [
