@@ -3,6 +3,9 @@ const express = require("express");
 const cTable = require("console.table");
 const app = express();
 const departmentClass = require("./lib/department.js");
+const roleClass = require("./lib/role.js");
+const employeeClass = require("./lib/employee.js");
+
 let sqldb = require("./db.js");
 
 // Array with Main Menu prompt
@@ -79,9 +82,10 @@ function runMainMenu() {
   returns table with all employees
     * 
 */
-function viewAllEmployees() {
-  let allEmployeesData = departmentClass.sqlRequestAllEmployees(sqldb);
-  console.log(allDepartmentsData);
+async function viewAllEmployees() {
+  const result = await employeeClass.sqlRequestAllEmployees(sqldb);
+  console.table(result);
+  runMainMenu();
 }
 
 /*
@@ -107,10 +111,11 @@ function updateEmployeeRole() {
   returns roles table
     * 
 */
-function viewAllRoles() {
-  console.log("They chose to View All Roles");
+async function viewAllRoles() {
+  const result = await roleClass.sqlRequestAllRoles(sqldb);
+  console.table(result);
+  runMainMenu();
 }
-
 /*
  addRole()
   add new role to role table
@@ -125,8 +130,10 @@ function addRole() {
   returns department table
     * 
 */
-function viewAllDepartments() {
-  departmentClass.sqlRequestAllDepartments(sqldb);
+async function viewAllDepartments() {
+  const result = await departmentClass.sqlRequestAllDepartments(sqldb);
+  console.table(result);
+  runMainMenu();
 }
 
 /*
@@ -158,14 +165,3 @@ function init() {
 
 // Initialize the application by calling init function
 init();
-
-// console.table([
-//   {
-//     name: "foo",
-//     age: 10,
-//   },
-//   {
-//     name: "bar",
-//     age: 20,
-//   },
-// ]);
