@@ -151,7 +151,8 @@ function addDepartment() {
     * 
 */
 function quitTracker() {
-  console.log("They chose to Quit");
+  console.log("Thank you for using the Employee Tracker!");
+  process.exit();
 }
 
 /*
