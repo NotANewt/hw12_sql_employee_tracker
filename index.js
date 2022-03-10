@@ -7,6 +7,8 @@ const employeeClass = require("./lib/employee.js");
 let sqldb = require("./db.js");
 
 let arrayOfDepartments = [];
+let arrayOfRoles = [];
+let arrayOfEmployees = [];
 
 // Array with Main Menu prompt
 const mainMenuPrompt = [
@@ -155,7 +157,7 @@ async function addRole() {
       },
     },
     {
-      name: "departmentOption",
+      name: "departmentSelected",
       type: "list",
       message: "What department does this role belong to?",
       choices: arrayOfDepartments,
@@ -165,7 +167,7 @@ async function addRole() {
   inquirer.prompt(addRolePrompts).then(async function (answers) {
     const newRoleTitle = answers.roleTitle;
     const newRoleSalary = answers.salary;
-    const newRoleDepartment = answers.departmentOption;
+    const newRoleDepartment = answers.departmentSelected;
     const roleDepartmentIdFromTable = await departmentClass.sqlGetDepartmentIdFromDepartmentName(sqldb, newRoleDepartment);
     const newRoleDepartmentId = roleDepartmentIdFromTable[0].id;
 
@@ -209,8 +211,107 @@ async function viewAllEmployees() {
   add new employee to employee table
     * 
 */
-function addEmployee() {
-  console.log("They chose to Add Employee");
+async function addEmployee() {
+  await updateRoleArray();
+
+  await updateEmployeeArray();
+
+  // Array with Add Employee prompts
+  const addEmployeePrompts = [
+    {
+      name: "firstName",
+      type: "input",
+      message: "Enter the employee's first name:",
+      validate: function (input) {
+        const valid = input !== "";
+        return valid || "Please enter a name";
+      },
+    },
+    {
+      name: "lastName",
+      type: "input",
+      message: "Enter the employee's last name:",
+      validate: function (input) {
+        const valid = input !== "";
+        return valid || "Please enter a name";
+      },
+    },
+    {
+      name: "roleSelected",
+      type: "list",
+      message: "What is this employee's role?",
+      choices: arrayOfRoles,
+    },
+
+    {
+      name: "managerSelected",
+      type: "list",
+      message: "What department does this role belong to?",
+      choices: arrayOfEmployees,
+    },
+  ];
+
+  inquirer.prompt(addEmployeePrompts).then(async function (answers) {
+    const newFirstName = answers.firstName;
+    const newLastName = answers.lastName;
+    const newEmployeeRole = answers.roleSelected;
+    const newManager = answers.managerSelected;
+    const newManagerNameArray = newManager.split(" ");
+    const newManagerFirstName = newManagerNameArray[0];
+    const newManagerLastName = newManagerNameArray[1];
+
+    const employeeRoleIdFromTable = await roleClass.sqlGetRoleIdFromRoleTitle(sqldb, newEmployeeRole);
+
+    const newEmployeeRoleId = employeeRoleIdFromTable[0].id;
+
+    // TODO: put in an if statement to handle if employee has no manager
+    const employeeManagerIdFromTable = await employeeClass.sqlGetManagerIdFromEmployeeName(sqldb, newManagerFirstName, newManagerLastName);
+    const newEmployeeManagerId = employeeManagerIdFromTable[0].id;
+
+    const addNewEmployee = await employeeClass.sqlAddEmployee(sqldb, newFirstName, newLastName, newEmployeeRoleId, newEmployeeManagerId);
+
+    runMainMenu();
+  });
+}
+
+/*
+ updateRoleArray()
+  select all role titles and put them into an array
+    * 
+*/
+async function updateRoleArray() {
+  let roleTitles = await roleClass.sqlGetAllRoleTitles(sqldb);
+
+  arrayOfRoles = [];
+
+  roleTitles.forEach((roleTitle) => {
+    for (let key in roleTitle) {
+      arrayOfRoles.push(roleTitle[key]);
+    }
+  });
+
+  return arrayOfRoles;
+}
+
+/*
+ updateEmployeeArray()
+  select all role titles and put them into an array
+    * 
+*/
+async function updateEmployeeArray() {
+  let employeeNames = await employeeClass.sqlGetAllEmployeeNames(sqldb);
+
+  arrayOfEmployees = [];
+
+  employeeNames.forEach((employeeName) => {
+    for (let key in employeeName) {
+      arrayOfEmployees.push(employeeName[key]);
+    }
+  });
+
+  arrayOfEmployees.push("This employee has no manager");
+
+  return arrayOfEmployees;
 }
 
 /*
