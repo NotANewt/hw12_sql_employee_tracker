@@ -6,6 +6,8 @@ const employeeClass = require("./lib/employee.js");
 
 let sqldb = require("./db.js");
 
+let arrayOfDepartments = [];
+
 // Array with Main Menu prompt
 const mainMenuPrompt = [
   {
@@ -129,8 +131,66 @@ async function viewAllRoles() {
   add new role to role table
     * 
 */
-function addRole() {
-  console.log("They chose to Add Role");
+async function addRole() {
+  await updateDepartmentsArray();
+
+  // Array with Add Role prompt
+  const addRolePrompts = [
+    {
+      name: "roleTitle",
+      type: "input",
+      message: "Enter role name.",
+      validate: function (input) {
+        const valid = input !== "";
+        return valid || "Please enter a department name";
+      },
+    },
+    {
+      name: "salary",
+      type: "input",
+      message: "Enter salary.",
+      validate: function (input) {
+        const valid = input !== "";
+        return valid || "Please enter a salary";
+      },
+    },
+    {
+      name: "departmentOption",
+      type: "list",
+      message: "What department does this role belong to?",
+      choices: arrayOfDepartments,
+    },
+  ];
+
+  inquirer.prompt(addRolePrompts).then(async function (answers) {
+    const newRoleTitle = answers.roleTitle;
+    const newRoleSalary = answers.salary;
+    const newRoleDepartment = answers.departmentOption;
+    const roleDepartmentIdFromTable = await departmentClass.sqlGetDepartmentIdFromDepartmentName(sqldb, newRoleDepartment);
+    const newRoleDepartmentId = roleDepartmentIdFromTable[0].id;
+
+    const addNewRole = await roleClass.sqlAddRole(sqldb, newRoleTitle, newRoleSalary, newRoleDepartmentId);
+    runMainMenu();
+  });
+}
+
+/*
+ getAllDepartmentsInArray()
+  select all department names and put them into an array
+    * 
+*/
+async function updateDepartmentsArray() {
+  let departmentNames = await departmentClass.sqlGetAllDepartmentNames(sqldb);
+
+  arrayOfDepartments = [];
+
+  departmentNames.forEach((departmentName) => {
+    for (let key in departmentName) {
+      arrayOfDepartments.push(departmentName[key]);
+    }
+  });
+
+  return arrayOfDepartments;
 }
 
 /*
