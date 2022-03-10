@@ -216,6 +216,8 @@ async function addEmployee() {
 
   await updateEmployeeArray();
 
+  arrayOfEmployees.push("This employee has no manager");
+
   // Array with Add Employee prompts
   const addEmployeePrompts = [
     {
@@ -246,7 +248,7 @@ async function addEmployee() {
     {
       name: "managerSelected",
       type: "list",
-      message: "What department does this role belong to?",
+      message: "Who is this employee's manager?",
       choices: arrayOfEmployees,
     },
   ];
@@ -265,7 +267,7 @@ async function addEmployee() {
     const newEmployeeRoleId = employeeRoleIdFromTable[0].id;
 
     // TODO: put in an if statement to handle if employee has no manager
-    const employeeManagerIdFromTable = await employeeClass.sqlGetManagerIdFromEmployeeName(sqldb, newManagerFirstName, newManagerLastName);
+    const employeeManagerIdFromTable = await employeeClass.sqlGetEmployeeIdFromEmployeeName(sqldb, newManagerFirstName, newManagerLastName);
     const newEmployeeManagerId = employeeManagerIdFromTable[0].id;
 
     const addNewEmployee = await employeeClass.sqlAddEmployee(sqldb, newFirstName, newLastName, newEmployeeRoleId, newEmployeeManagerId);
@@ -309,8 +311,6 @@ async function updateEmployeeArray() {
     }
   });
 
-  arrayOfEmployees.push("This employee has no manager");
-
   return arrayOfEmployees;
 }
 
@@ -319,8 +319,45 @@ async function updateEmployeeArray() {
   add new employee to employee table
     * 
 */
-function updateEmployeeRole() {
-  console.log("They chose to Update Employee Role");
+async function updateEmployeeRole() {
+  await updateEmployeeArray();
+  await updateRoleArray();
+
+  // Array with Update Employee Role prompts
+  const updateEmployeeRolePrompts = [
+    {
+      name: "employeeWhoseRoleWillBeUpdated",
+      type: "list",
+      message: "Please select an employee to update their role:",
+      choices: arrayOfEmployees,
+    },
+
+    {
+      name: "newRoleAssignment",
+      type: "list",
+      message: "What role would you like to assign to the employee?",
+      choices: arrayOfRoles,
+    },
+  ];
+
+  inquirer.prompt(updateEmployeeRolePrompts).then(async function (answers) {
+    const employeeWithUpdatedRole = answers.employeeWhoseRoleWillBeUpdated;
+    const updatedRoleForEmployee = answers.newRoleAssignment;
+
+    const employeeWithUpdatedRoleArray = employeeWithUpdatedRole.split(" ");
+    const updatedEmployeeFirstName = employeeWithUpdatedRoleArray[0];
+    const updatedEmployeeLastName = employeeWithUpdatedRoleArray[1];
+
+    const employeeIdFromTable = await employeeClass.sqlGetEmployeeIdFromEmployeeName(sqldb, updatedEmployeeFirstName, updatedEmployeeLastName);
+    const idOfUpdatedEmployee = employeeIdFromTable[0].id;
+
+    const employeeRoleIdFromTable = await roleClass.sqlGetRoleIdFromRoleTitle(sqldb, updatedRoleForEmployee);
+    const updatedRoleIdForEmployee = employeeRoleIdFromTable[0].id;
+
+    const updateEmployeeWithNewRole = await employeeClass.sqlUpdateEmployeeRole(sqldb, idOfUpdatedEmployee, updatedRoleIdForEmployee);
+
+    runMainMenu();
+  });
 }
 
 /*
