@@ -1,7 +1,5 @@
 const inquirer = require("inquirer");
-const express = require("express");
 const cTable = require("console.table");
-const app = express();
 const departmentClass = require("./lib/department.js");
 const roleClass = require("./lib/role.js");
 const employeeClass = require("./lib/employee.js");
@@ -14,7 +12,21 @@ const mainMenuPrompt = [
     name: "mainOptions",
     type: "list",
     message: "What would you like to do?",
-    choices: ["View All Employees", "Add Employee", "Update Employee Role", "View All Roles", "Add Role", "View All Departments", "Add Department", "Quit"],
+    choices: ["View All Departments", "Add Department", "View All Roles", "Add Role", "View All Employees", "Add Employee", "Update Employee Role", "Quit"],
+  },
+];
+
+// Array with Add Department prompt
+
+const addDepartmentPrompt = [
+  {
+    name: "departmentName",
+    type: "input",
+    message: "Enter department name.",
+    validate: function (input) {
+      const valid = input !== "";
+      return valid || "Please enter a department name";
+    },
   },
 ];
 
@@ -78,6 +90,50 @@ function runMainMenu() {
 }
 
 /*
+ viewAllDepartments()
+  returns department table
+    * 
+*/
+async function viewAllDepartments() {
+  const result = await departmentClass.sqlRequestAllDepartments(sqldb);
+  console.table(result);
+  runMainMenu();
+}
+
+/*
+ addDepartment()
+  add new department to department table
+    * 
+*/
+function addDepartment() {
+  inquirer.prompt(addDepartmentPrompt).then(async function (answers) {
+    const newDepartmentName = answers.departmentName;
+    const addNewDepartment = await departmentClass.sqlAddDepartment(sqldb, newDepartmentName);
+    runMainMenu();
+  });
+}
+
+/*
+ viewAllRoles()
+  returns roles table
+    * 
+*/
+async function viewAllRoles() {
+  const result = await roleClass.sqlRequestAllRoles(sqldb);
+  console.table(result);
+  runMainMenu();
+}
+
+/*
+ addRole()
+  add new role to role table
+    * 
+*/
+function addRole() {
+  console.log("They chose to Add Role");
+}
+
+/*
  viewAllEmployees()
   returns table with all employees
     * 
@@ -104,45 +160,6 @@ function addEmployee() {
 */
 function updateEmployeeRole() {
   console.log("They chose to Update Employee Role");
-}
-
-/*
- viewAllRoles()
-  returns roles table
-    * 
-*/
-async function viewAllRoles() {
-  const result = await roleClass.sqlRequestAllRoles(sqldb);
-  console.table(result);
-  runMainMenu();
-}
-/*
- addRole()
-  add new role to role table
-    * 
-*/
-function addRole() {
-  console.log("They chose to Add Role");
-}
-
-/*
- viewAllDepartments()
-  returns department table
-    * 
-*/
-async function viewAllDepartments() {
-  const result = await departmentClass.sqlRequestAllDepartments(sqldb);
-  console.table(result);
-  runMainMenu();
-}
-
-/*
- addDepartment()
-  add new department to department table
-    * 
-*/
-function addDepartment() {
-  console.log("They chose to Add Department");
 }
 
 /*
