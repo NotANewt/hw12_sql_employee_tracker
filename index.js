@@ -258,17 +258,20 @@ async function addEmployee() {
     const newLastName = answers.lastName;
     const newEmployeeRole = answers.roleSelected;
     const newManager = answers.managerSelected;
-    const newManagerNameArray = newManager.split(" ");
-    const newManagerFirstName = newManagerNameArray[0];
-    const newManagerLastName = newManagerNameArray[1];
+
+    if (newManager === "This employee has no manager") {
+      newEmployeeManagerId = "NULL";
+    } else {
+      const newManagerNameArray = newManager.split(" ");
+      const newManagerFirstName = newManagerNameArray[0];
+      const newManagerLastName = newManagerNameArray[1];
+
+      const employeeManagerIdFromTable = await employeeClass.sqlGetEmployeeIdFromEmployeeName(sqldb, newManagerFirstName, newManagerLastName);
+      const newEmployeeManagerId = employeeManagerIdFromTable[0].id;
+    }
 
     const employeeRoleIdFromTable = await roleClass.sqlGetRoleIdFromRoleTitle(sqldb, newEmployeeRole);
-
     const newEmployeeRoleId = employeeRoleIdFromTable[0].id;
-
-    // TODO: put in an if statement to handle if employee has no manager
-    const employeeManagerIdFromTable = await employeeClass.sqlGetEmployeeIdFromEmployeeName(sqldb, newManagerFirstName, newManagerLastName);
-    const newEmployeeManagerId = employeeManagerIdFromTable[0].id;
 
     const addNewEmployee = await employeeClass.sqlAddEmployee(sqldb, newFirstName, newLastName, newEmployeeRoleId, newEmployeeManagerId);
 
