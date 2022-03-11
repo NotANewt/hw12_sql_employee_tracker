@@ -319,7 +319,7 @@ async function updateEmployeeArray() {
 
 /*
  updateEmployeeRole()
-  add new employee to employee table
+  replace existing role with new role
     * 
 */
 async function updateEmployeeRole() {
@@ -364,6 +364,55 @@ async function updateEmployeeRole() {
 }
 
 /*
+ updateEmployeeManager()
+  replace existing manager with new manager
+    * 
+*/
+// TODO: functionality to update employee managers
+
+/*
+ viewEmployeesByManager()
+  select employees based on their manager
+    * 
+*/
+// TODO: functionality to view employees by their manager
+
+/*
+ viewEmployeesByDepartment()
+  select employees based on their department
+    * 
+*/
+// TODO: functionality to view employees by their department
+
+/*
+ deleteDepartment()
+  delete a department from the department table
+    * 
+*/
+// TODO: functionality to delete a department from the department table
+
+/*
+ deleteRole()
+  delete a role from the role table
+    * 
+*/
+// TODO: functionality to delete a role from the role table
+
+/*
+ deleteEmployee()
+  delete an employee from the employee table
+    * 
+*/
+// TODO: functionality to delete an employee from the employee table
+
+/*
+ viewDepartmentBudget()
+  see the combined salaries of all employees in a department
+    * 
+*/
+// TODO: functionality to see the combined salaries of all employees in a department
+
+/*
  quitTracker()
   quit the app
     * 
@@ -376,7 +425,7 @@ function quitTracker() {
 /*
  init()
   initializatize the application
-    * calls figletMain function
+    * calls bannerMain function
 */
 function init() {
   bannerMain();
