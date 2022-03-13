@@ -9,7 +9,6 @@ let sqldb = require("./db.js");
 let arrayOfDepartments = [];
 let arrayOfRoles = [];
 let arrayOfEmployees = [];
-let arrayOfPossibleManagers = [];
 
 /*
  bannerMain()
@@ -53,7 +52,7 @@ function runMainMenu() {
       name: "mainOptions",
       type: "list",
       message: "What would you like to do?",
-      choices: ["View All Departments", "Add Department", "View All Roles", "Add Role", "View All Employees", "Add Employee", "Update Employee Role", "Update Employee Manager", "View Employees By Manager", "View Employees By Department", "Quit"],
+      choices: ["View All Departments", "Add Department", "View All Roles", "Add Role", "View All Employees", "Add Employee", "Update Employee Role", "Update Employee Manager", "View Employees By Manager", "View Employees By Department", "Delete Department", "Quit"],
     },
   ];
 
@@ -80,6 +79,8 @@ function runMainMenu() {
       viewEmployeesByManager();
     } else if (mainMenuPick === "View Employees By Department") {
       viewEmployeesByDepartment();
+    } else if (mainMenuPick === "Delete Department") {
+      deleteDepartment();
     } else {
       quitTracker();
     }
@@ -473,7 +474,8 @@ async function viewEmployeesByManager() {
     const idOfManager = employeeIdFromTable[0].id;
     const result = await employeeClass.sqlViewEmployeesByManager(sqldb, idOfManager);
     if (result) {
-      console.log(`${updatedEmployeeFirstName} ${updatedEmployeeLastName} manages these employees:`);
+      console.log(`${updatedEmployeeFirstName} ${updatedEmployeeLastName} manages these employees:
+      `);
       console.table(result);
     } else {
       console.log(`${updatedEmployeeFirstName} ${updatedEmployeeLastName} does not manage any employees.`);
@@ -520,7 +522,26 @@ async function viewEmployeesByDepartment() {
   delete a department from the department table
     * 
 */
-// TODO: functionality to delete a department from the department table
+async function deleteDepartment() {
+  await updateDepartmentsArray();
+
+  const deleteDepartmentPrompt = [
+    {
+      name: "departmentChosen",
+      type: "list",
+      message: "Please select a department to delete:",
+      choices: arrayOfDepartments,
+    },
+  ];
+  inquirer.prompt(deleteDepartmentPrompt).then(async function (answers) {
+    const departmentName = answers.departmentChosen;
+    let departmentIdFromTable = await departmentClass.sqlGetDepartmentIdFromDepartmentName(sqldb, departmentName);
+    const idOfDepartment = departmentIdFromTable[0].id;
+    await departmentClass.sqlDeleteDepartment(sqldb, idOfDepartment);
+    console.log(`${departmentName} has been deleted`);
+    runMainMenu();
+  });
+}
 
 /*
  deleteRole()
