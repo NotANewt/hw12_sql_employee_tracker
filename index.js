@@ -52,7 +52,7 @@ function runMainMenu() {
       name: "mainOptions",
       type: "list",
       message: "What would you like to do?",
-      choices: ["View All Departments", "Add Department", "View All Roles", "Add Role", "View All Employees", "Add Employee", "Update Employee Role", "Update Employee Manager", "View Employees By Manager", "View Employees By Department", "Delete Department", "Quit"],
+      choices: ["View All Departments", "Add Department", "View All Roles", "Add Role", "View All Employees", "Add Employee", "Update Employee Role", "Update Employee Manager", "View Employees By Manager", "View Employees By Department", "Delete Department", "Delete Role", "Quit"],
     },
   ];
 
@@ -81,6 +81,8 @@ function runMainMenu() {
       viewEmployeesByDepartment();
     } else if (mainMenuPick === "Delete Department") {
       deleteDepartment();
+    } else if (mainMenuPick === "Delete Role") {
+      deleteRole();
     } else {
       quitTracker();
     }
@@ -266,12 +268,12 @@ async function addEmployee() {
   inquirer.prompt(addEmployeePrompts).then(async function (answers) {
     const newFirstName = answers.firstName;
     const newLastName = answers.lastName;
-    const newEmployeeRole = answers.roleSelected;
+    const roleTitle = answers.roleSelected;
     const newManager = answers.managerSelected;
 
     if (newManager === "This employee has no manager") {
       let newEmployeeManagerId = "NULL";
-      let employeeRoleIdFromTable = await roleClass.sqlGetRoleIdFromRoleTitle(sqldb, newEmployeeRole);
+      let employeeRoleIdFromTable = await roleClass.sqlGetRoleIdFromRoleTitle(sqldb, roleTitle);
       let newEmployeeRoleId = employeeRoleIdFromTable[0].id;
 
       await employeeClass.sqlAddEmployee(sqldb, newFirstName, newLastName, newEmployeeRoleId, newEmployeeManagerId);
@@ -285,7 +287,7 @@ async function addEmployee() {
       const employeeManagerIdFromTable = await employeeClass.sqlGetEmployeeIdFromEmployeeName(sqldb, newManagerFirstName, newManagerLastName);
       const newEmployeeManagerId = employeeManagerIdFromTable[0].id;
 
-      let employeeRoleIdFromTable = await roleClass.sqlGetRoleIdFromRoleTitle(sqldb, newEmployeeRole);
+      let employeeRoleIdFromTable = await roleClass.sqlGetRoleIdFromRoleTitle(sqldb, roleTitle);
       let newEmployeeRoleId = employeeRoleIdFromTable[0].id;
 
       await employeeClass.sqlAddEmployee(sqldb, newFirstName, newLastName, newEmployeeRoleId, newEmployeeManagerId);
@@ -548,7 +550,26 @@ async function deleteDepartment() {
   delete a role from the role table
     * 
 */
-// TODO: functionality to delete a role from the role table
+async function deleteRole() {
+  await updateRoleArray();
+
+  const deleteRolePrompt = [
+    {
+      name: "roleChosen",
+      type: "list",
+      message: "Please select a role to delete:",
+      choices: arrayOfRoles,
+    },
+  ];
+  inquirer.prompt(deleteRolePrompt).then(async function (answers) {
+    const roleTitle = answers.roleChosen;
+    let roleIdFromTable = await roleClass.sqlGetRoleIdFromRoleTitle(sqldb, roleTitle);
+    const idOfRole = roleIdFromTable[0].id;
+    await roleClass.sqlDeleteRole(sqldb, idOfRole);
+    console.log(`${roleTitle} has been deleted.`);
+    runMainMenu();
+  });
+}
 
 /*
  deleteEmployee()
