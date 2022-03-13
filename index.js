@@ -53,7 +53,7 @@ function runMainMenu() {
       name: "mainOptions",
       type: "list",
       message: "What would you like to do?",
-      choices: ["View All Departments", "Add Department", "View All Roles", "Add Role", "View All Employees", "Add Employee", "Update Employee Role", "Update Employee Manager", "Quit"],
+      choices: ["View All Departments", "Add Department", "View All Roles", "Add Role", "View All Employees", "Add Employee", "Update Employee Role", "Update Employee Manager", "View Employees By Manager", "Quit"],
     },
   ];
 
@@ -76,6 +76,8 @@ function runMainMenu() {
       addDepartment();
     } else if (mainMenuPick === "Update Employee Manager") {
       updateEmployeeManager();
+    } else if (mainMenuPick === "View Employees By Manager") {
+      viewEmployeesByManager();
     } else {
       quitTracker();
     }
@@ -382,7 +384,6 @@ async function updateEmployeeRole() {
   replace existing manager with new manager
     * 
 */
-// TODO: functionality to update employee managers
 async function updateEmployeeManager() {
   arrayOfEmployees = [];
   arrayOfPossibleManagers = [];
@@ -391,7 +392,7 @@ async function updateEmployeeManager() {
 
   arrayOfPossibleManagers = arrayOfEmployees.push("This employee has no manager");
 
-  // Array with Update Employee Role prompts
+  // Array with Update Employee Manager prompts
   const updateEmployeeManagerPrompts = [
     {
       name: "employeeToBeUpdated",
@@ -449,7 +450,36 @@ async function updateEmployeeManager() {
   select employees based on their manager
     * 
 */
-// TODO: functionality to view employees by their manager
+async function viewEmployeesByManager() {
+  arrayOfEmployees = [];
+  await updateEmployeeArray();
+
+  // Array with View Employees By Manager prompts
+  const viewEmployeesByManagerPrompt = [
+    {
+      name: "managerChosen",
+      type: "list",
+      message: "Please select an employee to see who they manage:",
+      choices: arrayOfEmployees,
+    },
+  ];
+  inquirer.prompt(viewEmployeesByManagerPrompt).then(async function (answers) {
+    const manager = answers.managerChosen;
+    const managerNameArray = manager.split(" ");
+    const updatedEmployeeFirstName = managerNameArray[0];
+    const updatedEmployeeLastName = managerNameArray[1];
+    let employeeIdFromTable = await employeeClass.sqlGetEmployeeIdFromEmployeeName(sqldb, updatedEmployeeFirstName, updatedEmployeeLastName);
+    const idOfManager = employeeIdFromTable[0].id;
+    const result = await employeeClass.sqlViewEmployeesByManager(sqldb, idOfManager);
+    if (result) {
+      console.log(`${updatedEmployeeFirstName} ${updatedEmployeeLastName} manages these employees:`);
+      console.table(result);
+    } else {
+      console.log(`${updatedEmployeeFirstName} ${updatedEmployeeLastName} does not manage any employees.`);
+    }
+    runMainMenu();
+  });
+}
 
 /*
  viewEmployeesByDepartment()
