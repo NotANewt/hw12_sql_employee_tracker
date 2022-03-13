@@ -53,7 +53,7 @@ function runMainMenu() {
       name: "mainOptions",
       type: "list",
       message: "What would you like to do?",
-      choices: ["View All Departments", "Add Department", "View All Roles", "Add Role", "View All Employees", "Add Employee", "Update Employee Role", "Update Employee Manager", "View Employees By Manager", "Quit"],
+      choices: ["View All Departments", "Add Department", "View All Roles", "Add Role", "View All Employees", "Add Employee", "Update Employee Role", "Update Employee Manager", "View Employees By Manager", "View Employees By Department", "Quit"],
     },
   ];
 
@@ -78,6 +78,8 @@ function runMainMenu() {
       updateEmployeeManager();
     } else if (mainMenuPick === "View Employees By Manager") {
       viewEmployeesByManager();
+    } else if (mainMenuPick === "View Employees By Department") {
+      viewEmployeesByDepartment();
     } else {
       quitTracker();
     }
@@ -173,8 +175,8 @@ async function addRole() {
   inquirer.prompt(addRolePrompts).then(async function (answers) {
     const newRoleTitle = answers.roleTitle;
     const newRoleSalary = answers.salary;
-    const newRoleDepartment = answers.departmentSelected;
-    const roleDepartmentIdFromTable = await departmentClass.sqlGetDepartmentIdFromDepartmentName(sqldb, newRoleDepartment);
+    const departmentName = answers.departmentSelected;
+    const roleDepartmentIdFromTable = await departmentClass.sqlGetDepartmentIdFromDepartmentName(sqldb, departmentName);
     const newRoleDepartmentId = roleDepartmentIdFromTable[0].id;
 
     await roleClass.sqlAddRole(sqldb, newRoleTitle, newRoleSalary, newRoleDepartmentId);
@@ -451,7 +453,6 @@ async function updateEmployeeManager() {
     * 
 */
 async function viewEmployeesByManager() {
-  arrayOfEmployees = [];
   await updateEmployeeArray();
 
   // Array with View Employees By Manager prompts
@@ -486,7 +487,33 @@ async function viewEmployeesByManager() {
   select employees based on their department
     * 
 */
-// TODO: functionality to view employees by their department
+async function viewEmployeesByDepartment() {
+  await updateDepartmentsArray();
+
+  // Array with View Employees By Manager prompts
+  const viewEmployeesByDepartmentPrompt = [
+    {
+      name: "departmentChosen",
+      type: "list",
+      message: "Please select a department to view its employees:",
+      choices: arrayOfDepartments,
+    },
+  ];
+  inquirer.prompt(viewEmployeesByDepartmentPrompt).then(async function (answers) {
+    const departmentName = answers.departmentChosen;
+    let departmentIdFromTable = await departmentClass.sqlGetDepartmentIdFromDepartmentName(sqldb, departmentName);
+    const idOfDepartment = departmentIdFromTable[0].id;
+    const result = await employeeClass.sqlViewEmployeesByDepartment(sqldb, idOfDepartment);
+    if (result) {
+      console.log(`${departmentName} has these employees:
+      `);
+      console.table(result);
+    } else {
+      console.log(`${departmentName} has no employees.`);
+    }
+    runMainMenu();
+  });
+}
 
 /*
  deleteDepartment()
