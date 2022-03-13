@@ -9,30 +9,7 @@ let sqldb = require("./db.js");
 let arrayOfDepartments = [];
 let arrayOfRoles = [];
 let arrayOfEmployees = [];
-
-// Array with Main Menu prompt
-const mainMenuPrompt = [
-  {
-    name: "mainOptions",
-    type: "list",
-    message: "What would you like to do?",
-    choices: ["View All Departments", "Add Department", "View All Roles", "Add Role", "View All Employees", "Add Employee", "Update Employee Role", "Quit"],
-  },
-];
-
-// Array with Add Department prompt
-
-const addDepartmentPrompt = [
-  {
-    name: "departmentName",
-    type: "input",
-    message: "Enter department name.",
-    validate: function (input) {
-      const valid = input !== "";
-      return valid || "Please enter a department name";
-    },
-  },
-];
+let arrayOfPossibleManagers = [];
 
 /*
  bannerMain()
@@ -70,6 +47,16 @@ function bannerMain() {
     * 
 */
 function runMainMenu() {
+  // Array with Main Menu prompt
+  const mainMenuPrompt = [
+    {
+      name: "mainOptions",
+      type: "list",
+      message: "What would you like to do?",
+      choices: ["View All Departments", "Add Department", "View All Roles", "Add Role", "View All Employees", "Add Employee", "Update Employee Role", "Update Employee Manager", "Quit"],
+    },
+  ];
+
   inquirer.prompt(mainMenuPrompt).then(function (answers) {
     let mainMenuPick = answers.mainOptions;
 
@@ -87,6 +74,8 @@ function runMainMenu() {
       viewAllDepartments();
     } else if (mainMenuPick === "Add Department") {
       addDepartment();
+    } else if (mainMenuPick === "Update Employee Manager") {
+      updateEmployeeManager();
     } else {
       quitTracker();
     }
@@ -110,9 +99,24 @@ async function viewAllDepartments() {
     * 
 */
 function addDepartment() {
+  // Array with Add Department prompt
+
+  const addDepartmentPrompt = [
+    {
+      name: "departmentName",
+      type: "input",
+      message: "Enter department name.",
+      validate: function (input) {
+        const valid = input !== "";
+        return valid || "Please enter a department name";
+      },
+    },
+  ];
+
   inquirer.prompt(addDepartmentPrompt).then(async function (answers) {
     const newDepartmentName = answers.departmentName;
-    const addNewDepartment = await departmentClass.sqlAddDepartment(sqldb, newDepartmentName);
+    await departmentClass.sqlAddDepartment(sqldb, newDepartmentName);
+    console.log(`Added new department: ${answers.departmentName}`);
     runMainMenu();
   });
 }
@@ -171,7 +175,8 @@ async function addRole() {
     const roleDepartmentIdFromTable = await departmentClass.sqlGetDepartmentIdFromDepartmentName(sqldb, newRoleDepartment);
     const newRoleDepartmentId = roleDepartmentIdFromTable[0].id;
 
-    const addNewRole = await roleClass.sqlAddRole(sqldb, newRoleTitle, newRoleSalary, newRoleDepartmentId);
+    await roleClass.sqlAddRole(sqldb, newRoleTitle, newRoleSalary, newRoleDepartmentId);
+    console.log(`Added new role: ${newRoleTitle}`);
     runMainMenu();
   });
 }
@@ -260,7 +265,13 @@ async function addEmployee() {
     const newManager = answers.managerSelected;
 
     if (newManager === "This employee has no manager") {
-      newEmployeeManagerId = "NULL";
+      let newEmployeeManagerId = "NULL";
+      let employeeRoleIdFromTable = await roleClass.sqlGetRoleIdFromRoleTitle(sqldb, newEmployeeRole);
+      let newEmployeeRoleId = employeeRoleIdFromTable[0].id;
+
+      await employeeClass.sqlAddEmployee(sqldb, newFirstName, newLastName, newEmployeeRoleId, newEmployeeManagerId);
+
+      console.log(`New Employee Added: ${newFirstName} ${newLastName}`);
     } else {
       const newManagerNameArray = newManager.split(" ");
       const newManagerFirstName = newManagerNameArray[0];
@@ -268,12 +279,14 @@ async function addEmployee() {
 
       const employeeManagerIdFromTable = await employeeClass.sqlGetEmployeeIdFromEmployeeName(sqldb, newManagerFirstName, newManagerLastName);
       const newEmployeeManagerId = employeeManagerIdFromTable[0].id;
+
+      let employeeRoleIdFromTable = await roleClass.sqlGetRoleIdFromRoleTitle(sqldb, newEmployeeRole);
+      let newEmployeeRoleId = employeeRoleIdFromTable[0].id;
+
+      await employeeClass.sqlAddEmployee(sqldb, newFirstName, newLastName, newEmployeeRoleId, newEmployeeManagerId);
+
+      console.log(`New Employee Added: ${newFirstName} ${newLastName}`);
     }
-
-    const employeeRoleIdFromTable = await roleClass.sqlGetRoleIdFromRoleTitle(sqldb, newEmployeeRole);
-    const newEmployeeRoleId = employeeRoleIdFromTable[0].id;
-
-    const addNewEmployee = await employeeClass.sqlAddEmployee(sqldb, newFirstName, newLastName, newEmployeeRoleId, newEmployeeManagerId);
 
     runMainMenu();
   });
@@ -329,7 +342,7 @@ async function updateEmployeeRole() {
   // Array with Update Employee Role prompts
   const updateEmployeeRolePrompts = [
     {
-      name: "employeeWhoseRoleWillBeUpdated",
+      name: "employeeToUpdate",
       type: "list",
       message: "Please select an employee to update their role:",
       choices: arrayOfEmployees,
@@ -344,7 +357,7 @@ async function updateEmployeeRole() {
   ];
 
   inquirer.prompt(updateEmployeeRolePrompts).then(async function (answers) {
-    const employeeWithUpdatedRole = answers.employeeWhoseRoleWillBeUpdated;
+    const employeeWithUpdatedRole = answers.employeeToUpdate;
     const updatedRoleForEmployee = answers.newRoleAssignment;
 
     const employeeWithUpdatedRoleArray = employeeWithUpdatedRole.split(" ");
@@ -354,10 +367,11 @@ async function updateEmployeeRole() {
     const employeeIdFromTable = await employeeClass.sqlGetEmployeeIdFromEmployeeName(sqldb, updatedEmployeeFirstName, updatedEmployeeLastName);
     const idOfUpdatedEmployee = employeeIdFromTable[0].id;
 
-    const employeeRoleIdFromTable = await roleClass.sqlGetRoleIdFromRoleTitle(sqldb, updatedRoleForEmployee);
-    const updatedRoleIdForEmployee = employeeRoleIdFromTable[0].id;
+    let employeeRoleIdFromTable = await roleClass.sqlGetRoleIdFromRoleTitle(sqldb, updatedRoleForEmployee);
+    let updatedRoleIdForEmployee = employeeRoleIdFromTable[0].id;
 
-    const updateEmployeeWithNewRole = await employeeClass.sqlUpdateEmployeeRole(sqldb, idOfUpdatedEmployee, updatedRoleIdForEmployee);
+    await employeeClass.sqlUpdateEmployeeRole(sqldb, idOfUpdatedEmployee, updatedRoleIdForEmployee);
+    console.log(`Updated Employee Role for: ${employeeWithUpdatedRole}`);
 
     runMainMenu();
   });
@@ -369,6 +383,66 @@ async function updateEmployeeRole() {
     * 
 */
 // TODO: functionality to update employee managers
+async function updateEmployeeManager() {
+  arrayOfEmployees = [];
+  arrayOfPossibleManagers = [];
+
+  await updateEmployeeArray();
+
+  arrayOfPossibleManagers = arrayOfEmployees.push("This employee has no manager");
+
+  // Array with Update Employee Role prompts
+  const updateEmployeeManagerPrompts = [
+    {
+      name: "employeeToBeUpdated",
+      type: "list",
+      message: "Please select an employee to update their manager:",
+      choices: arrayOfEmployees,
+    },
+
+    {
+      name: "updatedManager",
+      type: "list",
+      message: "Please select an employee to update their manager:",
+      choices: arrayOfEmployees,
+    },
+  ];
+
+  inquirer.prompt(updateEmployeeManagerPrompts).then(async function (answers) {
+    const employeeWithUpdatedManager = answers.employeeToBeUpdated;
+    const updatedManagerForEmployee = answers.updatedManager;
+
+    if (updatedManagerForEmployee === "This employee has no manager") {
+      let idOfUpdatedEmployeesManager = "NULL";
+      const employeeWithUpdatedManagerArray = employeeWithUpdatedManager.split(" ");
+      const updatedEmployeeFirstName = employeeWithUpdatedManagerArray[0];
+      const updatedEmployeeLastName = employeeWithUpdatedManagerArray[1];
+      let employeeIdFromTable = await employeeClass.sqlGetEmployeeIdFromEmployeeName(sqldb, updatedEmployeeFirstName, updatedEmployeeLastName);
+      const idOfUpdatedEmployee = employeeIdFromTable[0].id;
+      await employeeClass.sqlUpdateEmployeeManager(sqldb, idOfUpdatedEmployee, idOfUpdatedEmployeesManager);
+      console.log(`The manager of ${updatedEmployeeFirstName} ${updatedEmployeeLastName} has been updated.`);
+    } else {
+      const employeeWithUpdatedManagerArray = employeeWithUpdatedManager.split(" ");
+      const updatedEmployeeFirstName = employeeWithUpdatedManagerArray[0];
+      const updatedEmployeeLastName = employeeWithUpdatedManagerArray[1];
+
+      const employeesNewManagerArray = updatedManagerForEmployee.split(" ");
+      const updatedEmployeesManagersFirstName = employeesNewManagerArray[0];
+      const updatedEmployeesManagersLastName = employeesNewManagerArray[1];
+
+      let employeeIdFromTable = await employeeClass.sqlGetEmployeeIdFromEmployeeName(sqldb, updatedEmployeeFirstName, updatedEmployeeLastName);
+      const idOfUpdatedEmployee = employeeIdFromTable[0].id;
+
+      await employeeClass.sqlGetEmployeeIdFromEmployeeName(sqldb, updatedEmployeesManagersFirstName, updatedEmployeesManagersLastName);
+      const idOfUpdatedEmployeesManager = employeeIdFromTable[0].id;
+
+      await employeeClass.sqlUpdateEmployeeManager(sqldb, idOfUpdatedEmployee, idOfUpdatedEmployeesManager);
+      console.log(`The manager of ${updatedEmployeeFirstName} ${updatedEmployeeLastName} has been updated.`);
+    }
+
+    runMainMenu();
+  });
+}
 
 /*
  viewEmployeesByManager()
