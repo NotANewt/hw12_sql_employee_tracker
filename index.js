@@ -52,7 +52,7 @@ function runMainMenu() {
       name: "mainOptions",
       type: "list",
       message: "What would you like to do?",
-      choices: ["View All Departments", "Add Department", "View All Roles", "Add Role", "View All Employees", "Add Employee", "Update Employee Role", "Update Employee Manager", "View Employees By Manager", "View Employees By Department", "Delete Department", "Delete Role", "Quit"],
+      choices: ["View All Departments", "Add Department", "View All Roles", "Add Role", "View All Employees", "Add Employee", "Update Employee Role", "Update Employee Manager", "View Employees By Manager", "View Employees By Department", "Delete Department", "Delete Role", "Delete Employee", "Quit"],
     },
   ];
 
@@ -83,6 +83,8 @@ function runMainMenu() {
       deleteDepartment();
     } else if (mainMenuPick === "Delete Role") {
       deleteRole();
+    } else if (mainMenuPick === "Delete Employee") {
+      deleteEmployee();
     } else {
       quitTracker();
     }
@@ -576,7 +578,29 @@ async function deleteRole() {
   delete an employee from the employee table
     * 
 */
-// TODO: functionality to delete an employee from the employee table
+async function deleteEmployee() {
+  await updateEmployeeArray();
+
+  const deleteEmployeePrompt = [
+    {
+      name: "employeeChosen",
+      type: "list",
+      message: "Please select a role to delete:",
+      choices: arrayOfEmployees,
+    },
+  ];
+  inquirer.prompt(deleteEmployeePrompt).then(async function (answers) {
+    const employeeToDelete = answers.employeeChosen;
+    const employeeNameArray = employeeToDelete.split(" ");
+    const updatedEmployeeFirstName = employeeNameArray[0];
+    const updatedEmployeeLastName = employeeNameArray[1];
+    let employeeIdFromTable = await employeeClass.sqlGetEmployeeIdFromEmployeeName(sqldb, updatedEmployeeFirstName, updatedEmployeeLastName);
+    const idOfEmployoee = employeeIdFromTable[0].id;
+    await employeeClass.sqlDeleteEmployee(sqldb, idOfEmployoee);
+    console.log(`${employeeToDelete} has been deleted.`);
+    runMainMenu();
+  });
+}
 
 /*
  viewDepartmentBudget()
