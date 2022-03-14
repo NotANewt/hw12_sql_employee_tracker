@@ -44,7 +44,9 @@ function bannerMain() {
 /*
  runMainMenu()
   prompts user with the main options
-    * 
+    * array of prompts for the main menu options
+    * inquirer prompts user
+    * the appropriate function is called relating to the user's choice
 */
 function runMainMenu() {
   // Array with Main Menu prompt
@@ -97,7 +99,9 @@ function runMainMenu() {
 /*
  viewAllDepartments()
   returns department table
-    * 
+    * department class method sqlRequestAllDepartments queries the database
+    * console logs the results as a formatted table using cTable
+    * calls runMainMenu function
 */
 async function viewAllDepartments() {
   const result = await departmentClass.sqlRequestAllDepartments(sqldb);
@@ -107,12 +111,15 @@ async function viewAllDepartments() {
 
 /*
  addDepartment()
-  add new department to department table
-    * 
+  adds new department to department table
+    * array of the prompt
+    * inquirer to prompt user
+    * the new department name is set to variable newDepartmentName
+    * department class method sqlAddDepartment queries the database and adds department
+    * console log that the new department has been added
+    * calls runMainMenu function
 */
 function addDepartment() {
-  // Array with Add Department prompt
-
   const addDepartmentPrompt = [
     {
       name: "departmentName",
@@ -137,7 +144,9 @@ function addDepartment() {
 /*
  viewAllRoles()
   returns roles table
-    * 
+    * role class method sqlRequestAllRoles queries the database
+    * console logs the results as a formatted table using cTable
+    * calls runMainMenu function
 */
 async function viewAllRoles() {
   const result = await roleClass.sqlRequestAllRoles(sqldb);
@@ -147,8 +156,14 @@ async function viewAllRoles() {
 
 /*
  addRole()
-  add new role to role table
-    * 
+  adds new role to role table
+    * array of the prompts
+    * inquirer to prompt user
+    * user answers are saved to variables
+    * department class method sqlGetDepartmentIdFromDepartmentName queries the database and gets the department id
+    * role class method sqlAddRole queries the database and adds new role
+    * console log that the new role has been added
+    * calls runMainMenu function
 */
 async function addRole() {
   await updateDepartmentsArray();
@@ -196,9 +211,12 @@ async function addRole() {
 }
 
 /*
- getAllDepartmentsInArray()
+ updateDepartmentsArray()
   select all department names and put them into an array
-    * 
+    * department class method sqlGetAllDepartmentNames queries database and returns departmentNames, an array of objects
+    * arrayOfDepartments array is set to an empty array
+    * loop through the departmentNames array of objects and pushes each department name into the arrayOfDepartments array
+    * returns the filled arrayOfDepartments array
 */
 async function updateDepartmentsArray() {
   let departmentNames = await departmentClass.sqlGetAllDepartmentNames(sqldb);
@@ -217,7 +235,9 @@ async function updateDepartmentsArray() {
 /*
  viewAllEmployees()
   returns table with all employees
-    * 
+    * employee class method sqlRequestAllEmployees queries the database
+    * console logs the results as a formatted table using cTable
+    * calls runMainMenu function
 */
 async function viewAllEmployees() {
   const result = await employeeClass.sqlRequestAllEmployees(sqldb);
@@ -228,7 +248,24 @@ async function viewAllEmployees() {
 /*
  addEmployee()
   add new employee to employee table
-    * 
+    * calls updateRoleArray function
+    * calls updateEmployeeArray function
+    * pushes "This employee has no manager" into arrayOfEmployees
+    * array of the prompts
+    * inquirer to prompt user
+    * user answers are saved to variables
+    * if the user chose "This employee has no manager.":
+      * set eEmployeeManagerId to NULL
+      * role class method sqlGetRoleIdFromRoleTitle queries the database and gets the role id
+      * employee class method sqlAddEmployee queries the database and adds new employee
+    * if the user chose an employee as the manager:
+      * create an array of the first and last name answers
+      * assign first and last names in array to separate variables
+      * employee class method sqlGetEmployeeIdFromEmployeeName queries the database and gets the employee id of the manager
+      * role class method sqlGetRoleIdFromRoleTitle queries the database and gets the role id
+      * employee class method sqlAddEmployee queries the database and adds new employee
+      * console log that the new role has been added
+    * calls runMainMenu function
 */
 async function addEmployee() {
   await updateRoleArray();
@@ -237,7 +274,6 @@ async function addEmployee() {
 
   arrayOfEmployees.push("This employee has no manager");
 
-  // Array with Add Employee prompts
   const addEmployeePrompts = [
     {
       name: "firstName",
@@ -311,7 +347,10 @@ async function addEmployee() {
 /*
  updateRoleArray()
   select all role titles and put them into an array
-    * 
+    * role class method sqlGetAllRoleTitles queries database and returns roleTitles, an array of objects
+    * arrayOfRoles array is set to an empty array
+    * loop through the roleTitles array of objects and pushes each role title into the arrayOfRoles array
+    * returns the filled arrayOfRoles array
 */
 async function updateRoleArray() {
   let roleTitles = await roleClass.sqlGetAllRoleTitles(sqldb);
@@ -330,7 +369,10 @@ async function updateRoleArray() {
 /*
  updateEmployeeArray()
   select all role titles and put them into an array
-    * 
+    * employee class method sqlGetAllEmployeeNames queries database and returns employeeNames, an array of objects
+    * arrayOfEmployees array is set to an empty array
+    * loop through the employeeNames array of objects and pushes each employee name into the arrayOfEmployees array
+    * returns the filled arrayOfEmployees array
 */
 async function updateEmployeeArray() {
   let employeeNames = await employeeClass.sqlGetAllEmployeeNames(sqldb);
@@ -349,13 +391,23 @@ async function updateEmployeeArray() {
 /*
  updateEmployeeRole()
   replace existing role with new role
-    * 
+    * calls updateEmployeeArray function
+    * calls updatedRoleArray function
+    * array with prompts
+    * inquirer prompts the user
+    * user answers are assigned to variables
+    * employee name is split into an array with two strings
+    * each string in the array is assigned to its own variable
+    * employee class method sqlGetEmployeeIdFromEmployeeName queries the database and returns the employee id
+    * role class method sqlGetRoleIdFromRoleTitle queries the database and returns the role id
+    * employee class method sqlUpdateEmployeeRole queries the database and updates the employee's role
+    * console log that the role has been updated
+    * calls runMainMenu function
 */
 async function updateEmployeeRole() {
   await updateEmployeeArray();
   await updateRoleArray();
 
-  // Array with Update Employee Role prompts
   const updateEmployeeRolePrompts = [
     {
       name: "employeeToUpdate",
@@ -397,14 +449,33 @@ async function updateEmployeeRole() {
 /*
  updateEmployeeManager()
   replace existing manager with new manager
-    * 
+    * calls updateEmployeeArray function
+    * adds "This employee has no manager." to the arrayOfEmployees array
+    * array of prompts
+    * inquirer prompts user
+    * if the user chose "This employee has no manager.":
+      * set idOfUpdatedEmployeesManager to NULL
+      * create an array of the first and last name answers for the employee whose manager will be updated
+      * assign first and last names in array to separate variables
+      * employee class method sqlGetEmployeeIdFromEmployeeName queries the database and returns the employee id
+      * employee class method sqlUpdateEmployeeManager queries the database and updates the employee's manager
+      * console log that the changes has been made
+    * if the user chose an employee as the manager:
+      * create an array of the first and last name answers for the employee whose manager will be updated
+      * assign first and last names in array to separate variables
+      * create an array of the first and last name answers for the manager
+      * assign first and last names in array to separate variables
+      * employee class method sqlGetEmployeeIdFromEmployeeName queries the database and returns the employee id of the employee
+      * employee class method sqlGetEmployeeIdFromEmployeeName queries the database and returns the employee id of the manager
+      * employee class method sqlUpdateEmployeeManager queries the database and updates the employee's manager
+      * console log that the changes has been made
+    * calls funMainMenu function
 */
 async function updateEmployeeManager() {
   await updateEmployeeArray();
 
-  arrayOfPossibleManagers = arrayOfEmployees.push("This employee has no manager");
+  arrayOfPossibleManagers = arrayOfEmployees.push("This employee has no manager.");
 
-  // Array with Update Employee Manager prompts
   const updateEmployeeManagerPrompts = [
     {
       name: "employeeToBeUpdated",
@@ -462,12 +533,23 @@ async function updateEmployeeManager() {
 /*
  viewEmployeesByManager()
   select employees based on their manager
-    * 
+    * calls updateEmployeeArray function
+    * array of prompts for user
+    * inquirer prompts the user
+    * manager name is assigned a variable
+    * create an array of the first and last name answers for the employee whose manager will be updated
+    * assign first and last names in array to separate variables
+    * employee class method sqlGetEmployeeIdFromEmployeeName queries database and returns the employee id of the manager
+    * if something was returned
+      * console log the name of the employee selected
+      * console log a formatted table of the first and last names of the employees they manage
+    * if nothing was returned
+      * console log that this employee does not manage any employees
+    * calls runMainMenu function
 */
 async function viewEmployeesByManager() {
   await updateEmployeeArray();
 
-  // Array with View Employees By Manager prompts
   const viewEmployeesByManagerPrompt = [
     {
       name: "managerChosen",
@@ -499,12 +581,21 @@ async function viewEmployeesByManager() {
 /*
  viewEmployeesByDepartment()
   select employees based on their department
-    * 
+    * calls updateDepartmentsArray function
+    * array with prompts for the user
+    * inquirer prompts user
+    * answer is assigned to a variable
+    * department class method sqlGetDepartmentIdFromDepartmentName queries the database and returns the department id
+    * if something was returned
+      * console log the name of the partment
+      * console log a formatted table of the first and last names of the employees in that department
+    * if nothing was returned
+      * console log that this department has no employees
+    * calls runMainMenu function
 */
 async function viewEmployeesByDepartment() {
   await updateDepartmentsArray();
 
-  // Array with View Employees By Manager prompts
   const viewEmployeesByDepartmentPrompt = [
     {
       name: "departmentChosen",
@@ -533,7 +624,14 @@ async function viewEmployeesByDepartment() {
 /*
  deleteDepartment()
   delete a department from the department table
-    * 
+    * calls updateDepartmentsArray function
+    * array of prompts for the user
+    * inquirer prompts user
+    * answer is saved to a variable
+    * department class method sqlGetDepartmentIdFromDepartmentName queries the database and returns the department id
+    * department class method sqlDeleteDepartment queries the database and deletes the department
+    * console log that the department has been deleted
+    * calls runMainMenu function
 */
 async function deleteDepartment() {
   await updateDepartmentsArray();
@@ -560,7 +658,14 @@ async function deleteDepartment() {
 /*
  deleteRole()
   delete a role from the role table
-    * 
+    * calls updateRoleArray function
+    * array of prompts for the user
+    * inquirer prompts user
+    * answer is saved to a variable
+    * role class method sqlGetRoleIdFromDepartmentName queries the database and returns the role id
+    * role class method sqlDeleteRole queries the database and deletes the role
+    * console log that the role has been deleted
+    * calls runMainMenu function
 */
 async function deleteRole() {
   await updateRoleArray();
@@ -587,7 +692,17 @@ async function deleteRole() {
 /*
  deleteEmployee()
   delete an employee from the employee table
-    * 
+    * calls updateEmployeeArray function
+    * array of prompts for the user
+    * inquirer prompts user
+    * answer is saved to a variable
+    * create an array of the first and last name answers for the employee
+    * assign first and last names in array to separate variables
+    * employee class method sqlGetEmployeeIdFromEmployeeName queries database and returns the employee id of the manager
+    * employee class method sqlDeleteEmployee queries the database and deletes the employee
+    * console log that the employee has been deleted
+    * calls runMainMenu function
+
 */
 async function deleteEmployee() {
   await updateEmployeeArray();
@@ -617,7 +732,22 @@ async function deleteEmployee() {
 /*
  viewTotalUtilizedBudgetOfADepartment()
   see the combined salaries of all employees in a department
-    * 
+    * calls updateDepartmentsArray function
+    * array of prompts for the user
+    * inquirer prompts user
+    * answer is saved to a variable
+    * department class method sqlGetDepartmentIdFromDepartmentName queries database and returns department id
+    * deoartment class method sqlViewDepartmentBudget queries database and returns an array of objects saved to variable allSalariesInDepartment
+    * set salaryArrayAsInt array to an empty array
+    * loop through allSalariesInDepartment array of objects
+      * for each objects in the array
+      * push the key value as an integer into the salaryArrayAsInt array
+    * set totalUtilized Budget to 0
+    * loop through salaryArrayAsInt array
+    * for each salary
+    * add its value to totalUtilizedBudget
+    * console log the total utilized budget as totalUtilizedBudget
+    * call runMainMenu function
 */
 async function viewTotalUtilizedBudgetOfADepartment() {
   await updateDepartmentsArray();
@@ -659,7 +789,8 @@ async function viewTotalUtilizedBudgetOfADepartment() {
 /*
  quitTracker()
   quit the app
-    * 
+    * console log "Thank you for using the Employee Tracker!"
+    * exit the application
 */
 function quitTracker() {
   console.log("Thank you for using the Employee Tracker!");
