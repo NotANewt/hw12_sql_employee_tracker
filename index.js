@@ -52,7 +52,7 @@ function runMainMenu() {
       name: "mainOptions",
       type: "list",
       message: "What would you like to do?",
-      choices: ["View All Departments", "Add Department", "View All Roles", "Add Role", "View All Employees", "Add Employee", "Update Employee Role", "Update Employee Manager", "View Employees By Manager", "View Employees By Department", "Delete Department", "Delete Role", "Delete Employee", "Quit"],
+      choices: ["View All Departments", "Add Department", "View All Roles", "Add Role", "View All Employees", "Add Employee", "Update Employee Role", "Update Employee Manager", "View Employees By Manager", "View Employees By Department", "Delete Department", "Delete Role", "Delete Employee", "View The Total Utilized Budget of a Department", "Quit"],
     },
   ];
 
@@ -85,6 +85,8 @@ function runMainMenu() {
       deleteRole();
     } else if (mainMenuPick === "Delete Employee") {
       deleteEmployee();
+    } else if (mainMenuPick === "View The Total Utilized Budget of a Department") {
+      viewTotalUtilizedBudgetOfADepartment();
     } else {
       quitTracker();
     }
@@ -603,11 +605,45 @@ async function deleteEmployee() {
 }
 
 /*
- viewDepartmentBudget()
+ viewTotalUtilizedBudgetOfADepartment()
   see the combined salaries of all employees in a department
     * 
 */
-// TODO: functionality to see the combined salaries of all employees in a department
+async function viewTotalUtilizedBudgetOfADepartment() {
+  await updateDepartmentsArray();
+
+  const viewDepartmentBudgetPrompt = [
+    {
+      name: "departmentChosen",
+      type: "list",
+      message: "Please select a department to see its total utilized budget:",
+      choices: arrayOfDepartments,
+    },
+  ];
+  inquirer.prompt(viewDepartmentBudgetPrompt).then(async function (answers) {
+    const departmentName = answers.departmentChosen;
+    let departmentIdFromTable = await departmentClass.sqlGetDepartmentIdFromDepartmentName(sqldb, departmentName);
+    const idOfDepartment = departmentIdFromTable[0].id;
+
+    let allSalariesInDepartment = await departmentClass.sqlViewDepartmentBudget(sqldb, idOfDepartment);
+
+    let salaryArrayAsInt = [];
+
+    allSalariesInDepartment.forEach((salary) => {
+      for (let key in salary) {
+        salaryArrayAsInt.push(parseInt(salary[key]));
+      }
+    });
+
+    let totalUtilizedBudget = 0;
+
+    for (let i = 0; i < salaryArrayAsInt.length; i++) {
+      totalUtilizedBudget += salaryArrayAsInt[i];
+    }
+    console.log(`The total utilized budget of ${departmentName} is ${totalUtilizedBudget}`);
+    runMainMenu();
+  });
+}
 
 /*
  quitTracker()
