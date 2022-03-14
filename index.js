@@ -9,6 +9,7 @@ let sqldb = require("./db.js");
 let arrayOfDepartments = [];
 let arrayOfRoles = [];
 let arrayOfEmployees = [];
+let arrayOfPossibleManagers = [];
 
 /*
  bannerMain()
@@ -443,8 +444,8 @@ async function updateEmployeeManager() {
       let employeeIdFromTable = await employeeClass.sqlGetEmployeeIdFromEmployeeName(sqldb, updatedEmployeeFirstName, updatedEmployeeLastName);
       const idOfUpdatedEmployee = employeeIdFromTable[0].id;
 
-      await employeeClass.sqlGetEmployeeIdFromEmployeeName(sqldb, updatedEmployeesManagersFirstName, updatedEmployeesManagersLastName);
-      const idOfUpdatedEmployeesManager = employeeIdFromTable[0].id;
+      let managerIdFromTable = await employeeClass.sqlGetEmployeeIdFromEmployeeName(sqldb, updatedEmployeesManagersFirstName, updatedEmployeesManagersLastName);
+      const idOfUpdatedEmployeesManager = managerIdFromTable[0].id;
 
       await employeeClass.sqlUpdateEmployeeManager(sqldb, idOfUpdatedEmployee, idOfUpdatedEmployeesManager);
       console.log(`The manager of ${updatedEmployeeFirstName} ${updatedEmployeeLastName} has been updated.`);
