@@ -1,8 +1,6 @@
 const mysql = require("mysql2");
 require("dotenv").config();
 
-const PORT = process.env.PORT || 3001;
-
 // set connection variables
 let config = {
   host: "localhost",
