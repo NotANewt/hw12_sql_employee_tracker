@@ -128,7 +128,8 @@ function addDepartment() {
   inquirer.prompt(addDepartmentPrompt).then(async function (answers) {
     const newDepartmentName = answers.departmentName;
     await departmentClass.sqlAddDepartment(sqldb, newDepartmentName);
-    console.log(`Added new department: ${answers.departmentName}`);
+    console.log(`Added new department: ${answers.departmentName}
+    `);
     runMainMenu();
   });
 }
@@ -188,7 +189,8 @@ async function addRole() {
     const newRoleDepartmentId = roleDepartmentIdFromTable[0].id;
 
     await roleClass.sqlAddRole(sqldb, newRoleTitle, newRoleSalary, newRoleDepartmentId);
-    console.log(`Added new role: ${newRoleTitle}`);
+    console.log(`Added new role: ${newRoleTitle}
+    `);
     runMainMenu();
   });
 }
@@ -283,7 +285,8 @@ async function addEmployee() {
 
       await employeeClass.sqlAddEmployee(sqldb, newFirstName, newLastName, newEmployeeRoleId, newEmployeeManagerId);
 
-      console.log(`New Employee Added: ${newFirstName} ${newLastName}`);
+      console.log(`New Employee Added: ${newFirstName} ${newLastName}
+      `);
     } else {
       const newManagerNameArray = newManager.split(" ");
       const newManagerFirstName = newManagerNameArray[0];
@@ -297,7 +300,8 @@ async function addEmployee() {
 
       await employeeClass.sqlAddEmployee(sqldb, newFirstName, newLastName, newEmployeeRoleId, newEmployeeManagerId);
 
-      console.log(`New Employee Added: ${newFirstName} ${newLastName}`);
+      console.log(`New Employee Added: ${newFirstName} ${newLastName}
+      `);
     }
 
     runMainMenu();
@@ -383,7 +387,8 @@ async function updateEmployeeRole() {
     let updatedRoleIdForEmployee = employeeRoleIdFromTable[0].id;
 
     await employeeClass.sqlUpdateEmployeeRole(sqldb, idOfUpdatedEmployee, updatedRoleIdForEmployee);
-    console.log(`Updated Employee Role for: ${employeeWithUpdatedRole}`);
+    console.log(`Updated Employee Role for: ${employeeWithUpdatedRole}
+    `);
 
     runMainMenu();
   });
@@ -395,9 +400,6 @@ async function updateEmployeeRole() {
     * 
 */
 async function updateEmployeeManager() {
-  arrayOfEmployees = [];
-  arrayOfPossibleManagers = [];
-
   await updateEmployeeArray();
 
   arrayOfPossibleManagers = arrayOfEmployees.push("This employee has no manager");
@@ -431,7 +433,8 @@ async function updateEmployeeManager() {
       let employeeIdFromTable = await employeeClass.sqlGetEmployeeIdFromEmployeeName(sqldb, updatedEmployeeFirstName, updatedEmployeeLastName);
       const idOfUpdatedEmployee = employeeIdFromTable[0].id;
       await employeeClass.sqlUpdateEmployeeManager(sqldb, idOfUpdatedEmployee, idOfUpdatedEmployeesManager);
-      console.log(`The manager of ${updatedEmployeeFirstName} ${updatedEmployeeLastName} has been updated.`);
+      console.log(`The manager of ${updatedEmployeeFirstName} ${updatedEmployeeLastName} has been updated.
+      `);
     } else {
       const employeeWithUpdatedManagerArray = employeeWithUpdatedManager.split(" ");
       const updatedEmployeeFirstName = employeeWithUpdatedManagerArray[0];
@@ -448,7 +451,8 @@ async function updateEmployeeManager() {
       const idOfUpdatedEmployeesManager = managerIdFromTable[0].id;
 
       await employeeClass.sqlUpdateEmployeeManager(sqldb, idOfUpdatedEmployee, idOfUpdatedEmployeesManager);
-      console.log(`The manager of ${updatedEmployeeFirstName} ${updatedEmployeeLastName} has been updated.`);
+      console.log(`The manager of ${updatedEmployeeFirstName} ${updatedEmployeeLastName} has been updated.
+      `);
     }
 
     runMainMenu();
@@ -485,7 +489,8 @@ async function viewEmployeesByManager() {
       `);
       console.table(result);
     } else {
-      console.log(`${updatedEmployeeFirstName} ${updatedEmployeeLastName} does not manage any employees.`);
+      console.log(`${updatedEmployeeFirstName} ${updatedEmployeeLastName} does not manage any employees.
+      `);
     }
     runMainMenu();
   });
@@ -518,7 +523,8 @@ async function viewEmployeesByDepartment() {
       `);
       console.table(result);
     } else {
-      console.log(`${departmentName} has no employees.`);
+      console.log(`${departmentName} has no employees.
+      `);
     }
     runMainMenu();
   });
@@ -545,7 +551,8 @@ async function deleteDepartment() {
     let departmentIdFromTable = await departmentClass.sqlGetDepartmentIdFromDepartmentName(sqldb, departmentName);
     const idOfDepartment = departmentIdFromTable[0].id;
     await departmentClass.sqlDeleteDepartment(sqldb, idOfDepartment);
-    console.log(`${departmentName} has been deleted`);
+    console.log(`${departmentName} has been deleted
+    `);
     runMainMenu();
   });
 }
@@ -571,7 +578,8 @@ async function deleteRole() {
     let roleIdFromTable = await roleClass.sqlGetRoleIdFromRoleTitle(sqldb, roleTitle);
     const idOfRole = roleIdFromTable[0].id;
     await roleClass.sqlDeleteRole(sqldb, idOfRole);
-    console.log(`${roleTitle} has been deleted.`);
+    console.log(`${roleTitle} has been deleted.
+    `);
     runMainMenu();
   });
 }
@@ -600,7 +608,8 @@ async function deleteEmployee() {
     let employeeIdFromTable = await employeeClass.sqlGetEmployeeIdFromEmployeeName(sqldb, updatedEmployeeFirstName, updatedEmployeeLastName);
     const idOfEmployoee = employeeIdFromTable[0].id;
     await employeeClass.sqlDeleteEmployee(sqldb, idOfEmployoee);
-    console.log(`${employeeToDelete} has been deleted.`);
+    console.log(`${employeeToDelete} has been deleted.
+    `);
     runMainMenu();
   });
 }
@@ -641,7 +650,8 @@ async function viewTotalUtilizedBudgetOfADepartment() {
     for (let i = 0; i < salaryArrayAsInt.length; i++) {
       totalUtilizedBudget += salaryArrayAsInt[i];
     }
-    console.log(`The total utilized budget of ${departmentName} is ${totalUtilizedBudget}`);
+    console.log(`The total utilized budget of ${departmentName} is ${totalUtilizedBudget}
+    `);
     runMainMenu();
   });
 }
