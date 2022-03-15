@@ -21,26 +21,10 @@
 
 ## Installation
 
-This app requires the installation of inquirer, mysql2, console.table, express, and dotenv to function. All can be installed from npmjs.com using the following inputs:
+This app requires the installation of inquirer, mysql2, console.table, express, and dotenv to function. All are included in the package.json file and can be installed with the following input:
 
 ```bash
-npm i inquirer
-```
-
-```bash
-npm i mysql2
-```
-
-```bash
-npm i console.table
-```
-
-```bash
-npm i express
-```
-
-```bash
-npm i dotenv
+npm install
 ```
 
 ## Usage
