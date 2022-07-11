@@ -62,5 +62,5 @@ If you have any questions:
 
 ## Links
 
-- Here is the repo: [NotANewt/SQL Employee Tracker](https://www.github.com/NotANewt/hw12_sql_employee_tracker)
+- Here is the repo: [NotANewt/SQL Employee Tracker](https://github.com/NotANewt/sql_employee_tracker)
 - Here is the walkthrough: [Walkthrough Video Link](https://drive.google.com/file/d/1oSujYGXvaIF7E6LM8NLM1sJqRhizYOkC/view)
